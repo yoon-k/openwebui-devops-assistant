@@ -9,6 +9,8 @@ AI-powered DevOps assistant that helps with log analysis, configuration generati
 > - Log analysis patterns
 > - Infrastructure as Code (IaC) templates
 > - Error diagnosis automation
+>
+> 🚀 **Continuous Improvement**: This project is under active development with ongoing enhancements planned.
 
 🔗 **[Live Demo](https://yoon-k.github.io/openwebui-devops-assistant/)**
 
