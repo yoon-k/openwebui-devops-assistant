@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI DevOps Assistant - Log Analysis, Config Generation & Error Diagnosis</title>
+    <meta name="description" content="AI-powered DevOps assistant for log analysis, configuration generation, and error diagnosis. Supports Docker, Kubernetes, CI/CD, Terraform, and more.">
+    <meta name="keywords" content="DevOps, AI, Log Analysis, Docker, Kubernetes, CI/CD, Terraform, Error Diagnosis, Configuration Generator">
+    <meta name="author" content="yoon-k">
+    <meta property="og:title" content="AI DevOps Assistant">
+    <meta property="og:description" content="Intelligent DevOps automation with AI-powered log analysis, config generation, and error diagnosis">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <div>
+                    <h1 id="title">AI DevOps Assistant</h1>
+                    <p id="subtitle" style="font-size: 0.75rem; color: var(--text-secondary);">Log analysis, config generation, error diagnosis</p>
+                </div>
+            </div>
+            <div class="lang-selector">
+                <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button>
+                <button class="lang-btn" data-lang="ko" onclick="setLanguage('ko')">한국어</button>
+                <button class="lang-btn" data-lang="ja" onclick="setLanguage('ja')">日本語</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="panel">
+            <div class="panel-header">
+                <span id="inputPanelTitle" class="panel-title">INPUT</span>
+                <div class="tabs">
+                    <button class="tab active" data-tab="config" id="tabConfig" onclick="showTab('config')">Config</button>
+                    <button class="tab" data-tab="logs" id="tabLogs" onclick="showTab('logs')">Logs</button>
+                    <button class="tab" data-tab="diagnose" id="tabDiagnose" onclick="showTab('diagnose')">Diagnose</button>
+                    <button class="tab" data-tab="chat" id="tabChat" onclick="showTab('chat')">Chat</button>
+                </div>
+            </div>
+            <div class="panel-body" id="formContainer"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span id="outputPanelTitle" class="panel-title">OUTPUT</span>
+            </div>
+            <div class="panel-body" id="outputContainer">
+                <div class="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem; opacity: 0.5;">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="9" y1="9" x2="15" y2="9"/>
+                        <line x1="9" y1="13" x2="15" y2="13"/>
+                        <line x1="9" y1="17" x2="12" y2="17"/>
+                    </svg>
+                    <h3 id="emptyTitle">No Output Yet</h3>
+                    <p id="emptyDesc">Configure your input and run the analysis</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
