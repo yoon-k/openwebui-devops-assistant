@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI DevOps Assistant - Demo</title>
+    <meta name="description" content="AI-powered DevOps assistant demo - Log analysis, configuration generation, and error diagnosis">
+    <style>
+        :root { --primary: #22c55e; --primary-dark: #16a34a; --secondary: #3b82f6; --danger: #ef4444; --warning: #f59e0b; --bg-dark: #0f172a; --bg-card: #1e293b; --bg-input: #334155; --text-primary: #f8fafc; --text-secondary: #94a3b8; --border: #475569; --radius: 12px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
+        .header { background: linear-gradient(135deg, var(--bg-card), var(--bg-dark)); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
+        .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 0.75rem; }
+        .logo h1 { font-size: 1.25rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .badge { background: var(--warning); color: #000; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .lang-selector { display: flex; gap: 0.25rem; background: var(--bg-input); padding: 0.25rem; border-radius: 8px; }
+        .lang-btn { padding: 0.375rem 0.75rem; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+        .lang-btn.active { background: var(--primary); color: white; }
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .panel { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+        .panel-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .panel-title { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); }
+        .panel-body { padding: 1rem; max-height: calc(100vh - 200px); overflow: auto; }
+        .tabs { display: flex; gap: 0.25rem; background: var(--bg-dark); padding: 0.25rem; border-radius: 8px; }
+        .tab { padding: 0.5rem 1rem; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; border-radius: 6px; transition: all 0.2s; font-size: 0.875rem; }
+        .tab.active { background: var(--bg-card); color: var(--text-primary); }
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--text-secondary); }
+        .form-input, .form-textarea { width: 100%; padding: 0.625rem 1rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 0.875rem; }
+        .form-textarea { min-height: 120px; resize: vertical; font-family: 'Consolas', monospace; }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--primary); }
+        .btn { padding: 0.625rem 1.25rem; border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .chip { padding: 0.375rem 0.75rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 20px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+        .chip.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .code-block { background: var(--bg-dark); border-radius: 8px; padding: 1rem; font-family: 'Consolas', monospace; font-size: 0.8125rem; overflow-x: auto; white-space: pre-wrap; line-height: 1.5; }
+        .issue-item { padding: 0.75rem; background: var(--bg-dark); border-radius: 8px; margin-bottom: 0.5rem; border-left: 3px solid var(--border); }
+        .issue-item.error { border-left-color: var(--danger); }
+        .issue-item.warning { border-left-color: var(--warning); }
+        .issue-item.info { border-left-color: var(--secondary); }
+        .issue-level { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .issue-level.error { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .issue-level.warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .issue-level.info { background: rgba(59, 130, 246, 0.2); color: var(--secondary); }
+        .chat-messages { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+        .message { max-width: 85%; padding: 0.75rem; border-radius: 12px; font-size: 0.875rem; line-height: 1.5; }
+        .message.user { background: var(--primary); color: white; align-self: flex-end; }
+        .message.assistant { background: var(--bg-dark); align-self: flex-start; }
+        .chat-input-container { display: flex; gap: 0.75rem; }
+        .empty-state { text-align: center; padding: 3rem; color: var(--text-secondary); }
+        .loading { display: flex; align-items: center; justify-content: center; padding: 2rem; color: var(--text-secondary); }
+        .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-right: 0.75rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <div>
+                    <h1 id="title">AI DevOps Assistant</h1>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary);" id="subtitle">Log analysis, config generation, error diagnosis</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span class="badge">DEMO</span>
+                <div class="lang-selector">
+                    <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+                    <button class="lang-btn" onclick="setLanguage('ko')">한국어</button>
+                    <button class="lang-btn" onclick="setLanguage('ja')">日本語</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title" id="inputTitle">INPUT</span>
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('config', this)" id="tabConfig">Config</button>
+                    <button class="tab" onclick="showTab('logs', this)" id="tabLogs">Logs</button>
+                    <button class="tab" onclick="showTab('diagnose', this)" id="tabDiagnose">Diagnose</button>
+                    <button class="tab" onclick="showTab('chat', this)" id="tabChat">Chat</button>
+                </div>
+            </div>
+            <div class="panel-body" id="formContainer"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title" id="outputTitle">OUTPUT</span>
+            </div>
+            <div class="panel-body" id="outputContainer">
+                <div class="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem; opacity: 0.5;">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/>
+                    </svg>
+                    <h3 id="emptyTitle">No Output Yet</h3>
+                    <p id="emptyDesc">Configure your input and run the analysis</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+const i18n = {
+    en: { title: "AI DevOps Assistant", subtitle: "Log analysis, config generation, error diagnosis", input: "INPUT", output: "OUTPUT",
+        tabConfig: "Config", tabLogs: "Logs", tabDiagnose: "Diagnose", tabChat: "Chat",
+        configType: "Config Type", description: "Description", descPlaceholder: "Describe what you need...",
+        requirements: "Requirements", reqPlaceholder: "Enter requirements (optional)", generate: "Generate",
+        logs: "Log Content", logsPlaceholder: "Paste your logs here...", logType: "Log Type", analyze: "Analyze",
+        errorMsg: "Error Message", errorPlaceholder: "Paste the error message...", context: "Context",
+        contextPlaceholder: "Additional context...", stackTrace: "Stack Trace", diagnose: "Diagnose",
+        chatPlaceholder: "Ask about DevOps...", send: "Send", emptyTitle: "No Output Yet",
+        emptyDesc: "Configure your input and run the analysis",
+        dockerfile: "Dockerfile", docker_compose: "Docker Compose", kubernetes: "Kubernetes",
+        github_actions: "GitHub Actions", gitlab_ci: "GitLab CI", terraform: "Terraform", nginx: "Nginx", prometheus: "Prometheus",
+        welcome: "Hi! I'm your DevOps assistant. I can help with:\n\n• Docker & Kubernetes configs\n• CI/CD pipelines\n• Log analysis\n• Error diagnosis\n• Infrastructure setup" },
+    ko: { title: "AI DevOps 도우미", subtitle: "로그 분석, 설정 생성, 오류 진단", input: "입력", output: "출력",
+        tabConfig: "설정", tabLogs: "로그", tabDiagnose: "진단", tabChat: "채팅",
+        configType: "설정 유형", description: "설명", descPlaceholder: "필요한 것을 설명하세요...",
+        requirements: "요구사항", reqPlaceholder: "요구사항 입력 (선택)", generate: "생성",
+        logs: "로그 내용", logsPlaceholder: "로그를 붙여넣으세요...", logType: "로그 유형", analyze: "분석",
+        errorMsg: "오류 메시지", errorPlaceholder: "오류 메시지를 붙여넣으세요...", context: "컨텍스트",
+        contextPlaceholder: "추가 컨텍스트...", stackTrace: "스택 트레이스", diagnose: "진단",
+        chatPlaceholder: "DevOps에 대해 질문하세요...", send: "전송", emptyTitle: "출력 없음",
+        emptyDesc: "입력을 구성하고 분석을 실행하세요",
+        dockerfile: "Dockerfile", docker_compose: "Docker Compose", kubernetes: "Kubernetes",
+        github_actions: "GitHub Actions", gitlab_ci: "GitLab CI", terraform: "Terraform", nginx: "Nginx", prometheus: "Prometheus",
+        welcome: "안녕하세요! DevOps 도우미입니다:\n\n• Docker & Kubernetes 설정\n• CI/CD 파이프라인\n• 로그 분석\n• 오류 진단\n• 인프라 설정" },
+    ja: { title: "AI DevOpsアシスタント", subtitle: "ログ分析、設定生成、エラー診断", input: "入力", output: "出力",
+        tabConfig: "設定", tabLogs: "ログ", tabDiagnose: "診断", tabChat: "チャット",
+        configType: "設定タイプ", description: "説明", descPlaceholder: "必要なものを説明...",
+        requirements: "要件", reqPlaceholder: "要件を入力（オプション）", generate: "生成",
+        logs: "ログ内容", logsPlaceholder: "ログを貼り付け...", logType: "ログタイプ", analyze: "分析",
+        errorMsg: "エラーメッセージ", errorPlaceholder: "エラーメッセージを貼り付け...", context: "コンテキスト",
+        contextPlaceholder: "追加コンテキスト...", stackTrace: "スタックトレース", diagnose: "診断",
+        chatPlaceholder: "DevOpsについて質問...", send: "送信", emptyTitle: "出力なし",
+        emptyDesc: "入力を設定して分析を実行",
+        dockerfile: "Dockerfile", docker_compose: "Docker Compose", kubernetes: "Kubernetes",
+        github_actions: "GitHub Actions", gitlab_ci: "GitLab CI", terraform: "Terraform", nginx: "Nginx", prometheus: "Prometheus",
+        welcome: "こんにちは！DevOpsアシスタントです:\n\n• Docker & Kubernetes設定\n• CI/CDパイプライン\n• ログ分析\n• エラー診断\n• インフラ設定" }
+};
+
+let currentLang = 'en', currentTab = 'config', chatHistory = [];
+document.addEventListener('DOMContentLoaded', () => { setLanguage('en'); chatHistory = [{ role: 'assistant', content: i18n.en.welcome }]; });
+
+function setLanguage(lang) {
+    currentLang = lang;
+    const t = i18n[lang];
+    document.getElementById('title').textContent = t.title;
+    document.getElementById('subtitle').textContent = t.subtitle;
+    document.getElementById('inputTitle').textContent = t.input;
+    document.getElementById('outputTitle').textContent = t.output;
+    document.getElementById('tabConfig').textContent = t.tabConfig;
+    document.getElementById('tabLogs').textContent = t.tabLogs;
+    document.getElementById('tabDiagnose').textContent = t.tabDiagnose;
+    document.getElementById('tabChat').textContent = t.tabChat;
+    document.querySelectorAll('.lang-btn').forEach((btn, i) => btn.classList.toggle('active', i === ['en','ko','ja'].indexOf(lang)));
+    chatHistory = [{ role: 'assistant', content: t.welcome }];
+    updateForm();
+}
+
+function showTab(tab, btn) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    updateForm();
+}
+
+function updateForm() {
+    const t = i18n[currentLang], form = document.getElementById('formContainer');
+    const types = ['dockerfile', 'docker_compose', 'kubernetes', 'github_actions', 'gitlab_ci', 'terraform', 'nginx', 'prometheus'];
+
+    if (currentTab === 'config') {
+        form.innerHTML = `
+            <div class="form-group"><label class="form-label">${t.configType}</label>
+                <div class="chips">${types.map((type, i) => `<span class="chip ${i===0?'active':''}" onclick="selectChip(this)">${t[type]}</span>`).join('')}</div>
+            </div>
+            <div class="form-group"><label class="form-label">${t.description}</label><textarea class="form-textarea" rows="4" placeholder="${t.descPlaceholder}">Python Flask web application with PostgreSQL database</textarea></div>
+            <div class="form-group"><label class="form-label">${t.requirements}</label><input type="text" class="form-input" placeholder="${t.reqPlaceholder}" value="health check, logging, multi-stage build"></div>
+            <button class="btn btn-primary" onclick="runDemo('config')">${t.generate}</button>`;
+    } else if (currentTab === 'logs') {
+        form.innerHTML = `
+            <div class="form-group"><label class="form-label">${t.logs}</label><textarea class="form-textarea" rows="8" placeholder="${t.logsPlaceholder}">[2024-01-15 10:23:45] ERROR: Connection refused to database at 192.168.1.100:5432
+[2024-01-15 10:23:46] WARN: Retrying connection (attempt 1/3)
+[2024-01-15 10:23:47] ERROR: Connection timeout after 30s
+[2024-01-15 10:23:48] CRITICAL: Unable to establish database connection</textarea></div>
+            <div class="form-group"><label class="form-label">${t.logType}</label><input type="text" class="form-input" value="application"></div>
+            <button class="btn btn-primary" onclick="runDemo('logs')">${t.analyze}</button>`;
+    } else if (currentTab === 'diagnose') {
+        form.innerHTML = `
+            <div class="form-group"><label class="form-label">${t.errorMsg}</label><textarea class="form-textarea" rows="3" placeholder="${t.errorPlaceholder}">OOMKilled: Container exceeded memory limit</textarea></div>
+            <div class="form-group"><label class="form-label">${t.context}</label><input type="text" class="form-input" placeholder="${t.contextPlaceholder}" value="Kubernetes pod running Java application"></div>
+            <div class="form-group"><label class="form-label">${t.stackTrace}</label><textarea class="form-textarea" rows="3">java.lang.OutOfMemoryError: Java heap space at java.util.Arrays.copyOf</textarea></div>
+            <button class="btn btn-primary" onclick="runDemo('diagnose')">${t.diagnose}</button>`;
+    } else if (currentTab === 'chat') {
+        form.innerHTML = `<div class="chat-messages" id="chatMessages"></div><div class="chat-input-container"><input type="text" class="form-input" id="chatInput" placeholder="${t.chatPlaceholder}" onkeypress="if(event.key==='Enter')sendChat()"><button class="btn btn-primary" style="width:auto" onclick="sendChat()">${t.send}</button></div>`;
+        renderChat();
+    }
+}
+
+function selectChip(el) { document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); }
+
+function runDemo(type) {
+    const output = document.getElementById('outputContainer');
+    output.innerHTML = '<div class="loading"><div class="spinner"></div>Processing...</div>';
+
+    setTimeout(() => {
+        if (type === 'config') {
+            output.innerHTML = `<div class="code-block">FROM python:3.11-slim as builder
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+FROM python:3.11-slim
+WORKDIR /app
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser
+
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY . .
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \\
+    CMD curl -f http://localhost:5000/health || exit 1
+
+USER appuser
+EXPOSE 5000
+
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]</div>
+<p style="margin-top:1rem;color:var(--text-secondary)">✅ Multi-stage build for smaller image size<br>✅ Non-root user for security<br>✅ Health check endpoint configured<br>✅ Production-ready with Gunicorn</p>`;
+        } else if (type === 'logs') {
+            output.innerHTML = `<h3 style="margin-bottom:1rem">Log Analysis Results</h3>
+<div class="issue-item error"><span class="issue-level error">CRITICAL</span><p style="margin:0.5rem 0">Database connection failure detected</p><p style="color:var(--text-secondary);font-size:0.8125rem">Check if PostgreSQL is running and accessible at 192.168.1.100:5432</p></div>
+<div class="issue-item warning"><span class="issue-level warning">WARNING</span><p style="margin:0.5rem 0">Connection timeout (30s) may be too short</p><p style="color:var(--text-secondary);font-size:0.8125rem">Consider increasing timeout or checking network latency</p></div>
+<div class="issue-item info"><span class="issue-level info">INFO</span><p style="margin:0.5rem 0">Retry mechanism is working (3 attempts)</p><p style="color:var(--text-secondary);font-size:0.8125rem">Consider implementing exponential backoff</p></div>
+<p style="margin-top:1rem"><strong>Root Cause:</strong> Database server at 192.168.1.100 is either down or firewall is blocking port 5432</p>`;
+        } else if (type === 'diagnose') {
+            output.innerHTML = `<h3 style="margin-bottom:1rem">Error Diagnosis</h3>
+<p><strong>Issue:</strong> Java application running out of memory (OOMKilled by Kubernetes)</p>
+<p style="margin-top:1rem"><strong>Root Cause:</strong> JVM heap size exceeds container memory limits</p>
+<p style="margin-top:1rem"><strong>Solution:</strong> Configure JVM memory settings to respect container limits</p>
+<h4 style="margin-top:1rem">Recommended Steps:</h4>
+<ol style="padding-left:1.5rem;color:var(--text-secondary);line-height:1.8">
+<li>Add JVM flags: <code>-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0</code></li>
+<li>Increase pod memory limit: <code>resources.limits.memory: 2Gi</code></li>
+<li>Set JVM heap explicitly: <code>-Xmx1536m -Xms512m</code></li>
+<li>Enable GC logging to monitor memory usage</li>
+<li>Consider using G1GC: <code>-XX:+UseG1GC</code></li>
+</ol>`;
+        }
+    }, 1500);
+}
+
+function renderChat() {
+    const container = document.getElementById('chatMessages');
+    if (!container) return;
+    container.innerHTML = chatHistory.map(m => `<div class="message ${m.role}">${m.content.replace(/\n/g, '<br>')}</div>`).join('');
+    container.scrollTop = container.scrollHeight;
+}
+
+function sendChat() {
+    const input = document.getElementById('chatInput'), msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    chatHistory.push({ role: 'user', content: msg });
+    renderChat();
+
+    setTimeout(() => {
+        let response = "I'd be happy to help with that DevOps question! In a production environment, I would analyze your query and provide detailed guidance on Docker, Kubernetes, CI/CD, monitoring, and infrastructure best practices.";
+        if (msg.toLowerCase().includes('docker')) response = "For Docker best practices:\n\n• Use multi-stage builds\n• Run as non-root user\n• Minimize layers\n• Use .dockerignore\n• Pin base image versions\n• Add health checks";
+        else if (msg.toLowerCase().includes('kubernetes') || msg.toLowerCase().includes('k8s')) response = "Kubernetes recommendations:\n\n• Set resource limits/requests\n• Use liveness/readiness probes\n• Implement PodDisruptionBudgets\n• Use namespaces for isolation\n• Configure HPA for scaling";
+        chatHistory.push({ role: 'assistant', content: response });
+        renderChat();
+    }, 1000);
+}
+    </script>
+</body>
+</html>
