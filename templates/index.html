@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI DevOps Assistant - Log Analysis, Config Generation & Error Diagnosis</title>
-    <meta name="description" content="AI-powered DevOps assistant for log analysis, configuration generation, and error diagnosis. Supports Docker, Kubernetes, CI/CD, Terraform, and more.">
-    <meta name="keywords" content="DevOps, AI, Log Analysis, Docker, Kubernetes, CI/CD, Terraform, Error Diagnosis, Configuration Generator">
+    <title>AI DevOps Assistant - Log Analysis, Config Generation, Monitoring & Error Diagnosis</title>
+    <meta name="description" content="AI-powered DevOps assistant for log analysis, configuration generation, system monitoring, and error diagnosis. Supports Docker, Kubernetes, CI/CD, Terraform, Ansible, and more.">
+    <meta name="keywords" content="DevOps, AI, Log Analysis, Docker, Kubernetes, CI/CD, Terraform, Ansible, Prometheus, Grafana, Error Diagnosis, Configuration Generator, Monitoring">
     <meta name="author" content="yoon-k">
+    <meta name="robots" content="index, follow">
     <meta property="og:title" content="AI DevOps Assistant">
-    <meta property="og:description" content="Intelligent DevOps automation with AI-powered log analysis, config generation, and error diagnosis">
+    <meta property="og:description" content="Intelligent DevOps automation with AI-powered log analysis, config generation, monitoring, and error diagnosis">
     <meta property="og:type" content="website">
+    <meta property="og:image" content="/static/images/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI DevOps Assistant">
+    <meta name="twitter:description" content="AI-powered DevOps automation platform">
+    <link rel="canonical" href="https://yoon-k.github.io/openwebui-devops-assistant/">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -25,13 +31,17 @@
                 </svg>
                 <div>
                     <h1 id="title">AI DevOps Assistant</h1>
-                    <p id="subtitle" style="font-size: 0.75rem; color: var(--text-secondary);">Log analysis, config generation, error diagnosis</p>
+                    <p id="subtitle" style="font-size: 0.75rem; color: var(--text-secondary);">Log analysis, config generation, monitoring, error diagnosis</p>
                 </div>
             </div>
             <div class="lang-selector">
                 <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button>
                 <button class="lang-btn" data-lang="ko" onclick="setLanguage('ko')">한국어</button>
                 <button class="lang-btn" data-lang="ja" onclick="setLanguage('ja')">日本語</button>
+                <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
+                <button class="lang-btn" data-lang="es" onclick="setLanguage('es')">ES</button>
+                <button class="lang-btn" data-lang="fr" onclick="setLanguage('fr')">FR</button>
+                <button class="lang-btn" data-lang="de" onclick="setLanguage('de')">DE</button>
             </div>
         </div>
     </header>
@@ -44,7 +54,9 @@
                     <button class="tab active" data-tab="config" id="tabConfig" onclick="showTab('config')">Config</button>
                     <button class="tab" data-tab="logs" id="tabLogs" onclick="showTab('logs')">Logs</button>
                     <button class="tab" data-tab="diagnose" id="tabDiagnose" onclick="showTab('diagnose')">Diagnose</button>
+                    <button class="tab" data-tab="monitor" id="tabMonitor" onclick="showTab('monitor')">Monitor</button>
                     <button class="tab" data-tab="chat" id="tabChat" onclick="showTab('chat')">Chat</button>
+                    <button class="tab" data-tab="history" id="tabHistory" onclick="showTab('history')">History</button>
                 </div>
             </div>
             <div class="panel-body" id="formContainer"></div>
