@@ -3,58 +3,436 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI DevOps Assistant - Demo</title>
-    <meta name="description" content="AI-powered DevOps assistant demo - Log analysis, configuration generation, and error diagnosis">
+    <title>AI DevOps Assistant - Log Analysis, Config Generation, Monitoring & Error Diagnosis</title>
+    <meta name="description" content="AI-powered DevOps assistant for log analysis, configuration generation, system monitoring, and error diagnosis. Supports Docker, Kubernetes, CI/CD, Terraform, Ansible, and more.">
+    <meta name="keywords" content="DevOps, AI, Log Analysis, Docker, Kubernetes, CI/CD, Terraform, Ansible, Prometheus, Grafana, Error Diagnosis, Configuration Generator, Monitoring">
+    <meta name="author" content="yoon-k">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="AI DevOps Assistant">
+    <meta property="og:description" content="Intelligent DevOps automation with AI-powered log analysis, config generation, monitoring, and error diagnosis">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #22c55e; --primary-dark: #16a34a; --secondary: #3b82f6; --danger: #ef4444; --warning: #f59e0b; --bg-dark: #0f172a; --bg-card: #1e293b; --bg-input: #334155; --text-primary: #f8fafc; --text-secondary: #94a3b8; --border: #475569; --radius: 12px; }
+        :root {
+            --primary: #22c55e;
+            --primary-dark: #16a34a;
+            --primary-light: #4ade80;
+            --secondary: #3b82f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #06b6d4;
+            --bg-dark: #0f172a;
+            --bg-darker: #020617;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #475569;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+        [data-theme="light"] {
+            --bg-dark: #f1f5f9;
+            --bg-darker: #e2e8f0;
+            --bg-card: #ffffff;
+            --bg-input: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-        .header { background: linear-gradient(135deg, var(--bg-card), var(--bg-dark)); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
-        .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .logo { display: flex; align-items: center; gap: 0.75rem; }
-        .logo h1 { font-size: 1.25rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .badge { background: var(--warning); color: #000; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-        .lang-selector { display: flex; gap: 0.25rem; background: var(--bg-input); padding: 0.25rem; border-radius: 8px; }
-        .lang-btn { padding: 0.375rem 0.75rem; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-dark));
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .logo svg {
+            color: var(--primary);
+            filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.4));
+        }
+        .logo h1 {
+            font-size: 1.375rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .lang-selector {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-input);
+            padding: 0.25rem;
+            border-radius: var(--radius-sm);
+        }
+        .lang-btn {
+            padding: 0.375rem 0.625rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+        .lang-btn:hover { color: var(--text-primary); background: var(--bg-card); }
         .lang-btn.active { background: var(--primary); color: white; }
-        .main-container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .panel { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
-        .panel-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .panel-title { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); }
-        .panel-body { padding: 1rem; max-height: calc(100vh - 200px); overflow: auto; }
-        .tabs { display: flex; gap: 0.25rem; background: var(--bg-dark); padding: 0.25rem; border-radius: 8px; }
-        .tab { padding: 0.5rem 1rem; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; border-radius: 6px; transition: all 0.2s; font-size: 0.875rem; }
-        .tab.active { background: var(--bg-card); color: var(--text-primary); }
-        .form-group { margin-bottom: 1rem; }
-        .form-label { display: block; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--text-secondary); }
-        .form-input, .form-textarea { width: 100%; padding: 0.625rem 1rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 0.875rem; }
-        .form-textarea { min-height: 120px; resize: vertical; font-family: 'Consolas', monospace; }
-        .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--primary); }
-        .btn { padding: 0.625rem 1.25rem; border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-        .btn-primary { background: var(--primary); color: white; width: 100%; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .chip { padding: 0.375rem 0.75rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 20px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
-        .chip.active { background: var(--primary); border-color: var(--primary); color: white; }
-        .code-block { background: var(--bg-dark); border-radius: 8px; padding: 1rem; font-family: 'Consolas', monospace; font-size: 0.8125rem; overflow-x: auto; white-space: pre-wrap; line-height: 1.5; }
-        .issue-item { padding: 0.75rem; background: var(--bg-dark); border-radius: 8px; margin-bottom: 0.5rem; border-left: 3px solid var(--border); }
-        .issue-item.error { border-left-color: var(--danger); }
-        .issue-item.warning { border-left-color: var(--warning); }
-        .issue-item.info { border-left-color: var(--secondary); }
-        .issue-level { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
-        .issue-level.error { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
-        .issue-level.warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .issue-level.info { background: rgba(59, 130, 246, 0.2); color: var(--secondary); }
-        .chat-messages { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
-        .message { max-width: 85%; padding: 0.75rem; border-radius: 12px; font-size: 0.875rem; line-height: 1.5; }
-        .message.user { background: var(--primary); color: white; align-self: flex-end; }
-        .message.assistant { background: var(--bg-dark); align-self: flex-start; }
-        .chat-input-container { display: flex; gap: 0.75rem; }
-        .empty-state { text-align: center; padding: 3rem; color: var(--text-secondary); }
-        .loading { display: flex; align-items: center; justify-content: center; padding: 2rem; color: var(--text-secondary); }
-        .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-right: 0.75rem; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } }
+        .hero {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: linear-gradient(180deg, var(--bg-card), var(--bg-dark));
+        }
+        .hero h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--primary);
+        }
+        .features {
+            padding: 5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            transition: all 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .feature-icon svg { width: 24px; height: 24px; color: white; }
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+        }
+        .demo-section {
+            padding: 5rem 2rem;
+            background: var(--bg-card);
+        }
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        .panel {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .panel-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .panel-title {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-darker);
+            padding: 0.25rem;
+            border-radius: var(--radius-sm);
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+        .tab:hover { color: var(--text-primary); background: var(--bg-card); }
+        .tab.active { background: var(--bg-card); color: var(--primary); }
+        .panel-body { padding: 1.25rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label {
+            display: block;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+        .form-select, .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-family: inherit;
+        }
+        .form-select:focus, .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .presets-section { margin-bottom: 1.5rem; }
+        .presets-title {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+        .preset-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+        }
+        .preset-card {
+            padding: 0.75rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+        .preset-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .preset-card.active {
+            border-color: var(--primary);
+            background: rgba(34, 197, 94, 0.1);
+        }
+        .preset-icon { font-size: 1.25rem; margin-bottom: 0.25rem; }
+        .preset-name { font-size: 0.75rem; font-weight: 500; }
+        .code-block {
+            background: var(--bg-darker);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--bg-dark);
+            border-bottom: 1px solid var(--border);
+        }
+        .code-lang {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        .code-actions { display: flex; gap: 0.5rem; }
+        .code-content {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8125rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+        .tools-section {
+            padding: 5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .tool-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }
+        .tool-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 1rem;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+        }
+        .tool-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .tool-desc {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        footer a:hover { text-decoration: underline; }
+        @media (max-width: 1024px) {
+            .demo-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; gap: 1rem; }
+            .hero h2 { font-size: 2rem; }
+            .hero p { font-size: 1rem; }
+            .features-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -66,226 +444,436 @@
                 </svg>
                 <div>
                     <h1 id="title">AI DevOps Assistant</h1>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary);" id="subtitle">Log analysis, config generation, error diagnosis</p>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary);" id="subtitle">Log analysis, config generation, monitoring, error diagnosis</p>
                 </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <span class="badge">DEMO</span>
-                <div class="lang-selector">
-                    <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-                    <button class="lang-btn" onclick="setLanguage('ko')">한국어</button>
-                    <button class="lang-btn" onclick="setLanguage('ja')">日本語</button>
-                </div>
+            <div class="lang-selector">
+                <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button>
+                <button class="lang-btn" data-lang="ko" onclick="setLanguage('ko')">한국어</button>
+                <button class="lang-btn" data-lang="ja" onclick="setLanguage('ja')">日本語</button>
+                <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
+                <button class="lang-btn" data-lang="es" onclick="setLanguage('es')">ES</button>
+                <button class="lang-btn" data-lang="fr" onclick="setLanguage('fr')">FR</button>
+                <button class="lang-btn" data-lang="de" onclick="setLanguage('de')">DE</button>
             </div>
         </div>
     </header>
 
-    <main class="main-container">
-        <div class="panel">
-            <div class="panel-header">
-                <span class="panel-title" id="inputTitle">INPUT</span>
-                <div class="tabs">
-                    <button class="tab active" onclick="showTab('config', this)" id="tabConfig">Config</button>
-                    <button class="tab" onclick="showTab('logs', this)" id="tabLogs">Logs</button>
-                    <button class="tab" onclick="showTab('diagnose', this)" id="tabDiagnose">Diagnose</button>
-                    <button class="tab" onclick="showTab('chat', this)" id="tabChat">Chat</button>
-                </div>
-            </div>
-            <div class="panel-body" id="formContainer"></div>
+    <section class="hero">
+        <h2 id="heroTitle">AI-Powered DevOps Assistant</h2>
+        <p id="heroDesc">Automate your DevOps workflow with intelligent log analysis, configuration generation, system monitoring, and error diagnosis. Support for Docker, Kubernetes, Terraform, and more.</p>
+        <div class="hero-buttons">
+            <a href="#demo" class="btn btn-primary" id="tryDemoBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                <span>Try Demo</span>
+            </a>
+            <a href="https://github.com/yoon-k/openwebui-devops-assistant" class="btn btn-secondary" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                <span>GitHub</span>
+            </a>
         </div>
+    </section>
 
-        <div class="panel">
-            <div class="panel-header">
-                <span class="panel-title" id="outputTitle">OUTPUT</span>
-            </div>
-            <div class="panel-body" id="outputContainer">
-                <div class="empty-state">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem; opacity: 0.5;">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/>
+    <section class="features">
+        <h2 class="section-title" id="featuresTitle">Powerful Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
                     </svg>
-                    <h3 id="emptyTitle">No Output Yet</h3>
-                    <p id="emptyDesc">Configure your input and run the analysis</p>
+                </div>
+                <h3 id="feature1Title">Config Generation</h3>
+                <p id="feature1Desc">Generate production-ready configurations for Docker, Kubernetes, Terraform, Ansible, CI/CD pipelines, and more with AI assistance.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </div>
+                <h3 id="feature2Title">Log Analysis</h3>
+                <p id="feature2Desc">Intelligent log parsing and analysis to identify errors, warnings, and anomalies in your system logs with actionable insights.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </div>
+                <h3 id="feature3Title">Error Diagnosis</h3>
+                <p id="feature3Desc">Paste error messages and get instant diagnosis with root cause analysis and recommended solutions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                </div>
+                <h3 id="feature4Title">System Monitoring</h3>
+                <p id="feature4Desc">Generate monitoring configurations for Prometheus, Grafana, alerting rules, and runbooks for your infrastructure.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <h3 id="feature5Title">Multi-Platform Support</h3>
+                <p id="feature5Desc">Supports Docker, Kubernetes, Helm, GitHub Actions, GitLab CI, Jenkins, Terraform, Ansible, Nginx, and more.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                </div>
+                <h3 id="feature6Title">7 Languages</h3>
+                <p id="feature6Desc">Full internationalization support with English, Korean, Japanese, Chinese, Spanish, French, and German.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="demo-section" id="demo">
+        <div class="demo-container">
+            <h2 class="section-title" id="demoTitle">Interactive Demo</h2>
+            <div class="demo-grid">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title" id="inputPanelTitle">INPUT</span>
+                        <div class="tabs">
+                            <button class="tab active" data-tab="config" onclick="showTab('config')" id="tabConfig">Config</button>
+                            <button class="tab" data-tab="logs" onclick="showTab('logs')" id="tabLogs">Logs</button>
+                            <button class="tab" data-tab="diagnose" onclick="showTab('diagnose')" id="tabDiagnose">Diagnose</button>
+                            <button class="tab" data-tab="monitor" onclick="showTab('monitor')" id="tabMonitor">Monitor</button>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="formContainer">
+                        <div id="configForm">
+                            <div class="presets-section">
+                                <div class="presets-title" id="presetsTitle">Quick Presets</div>
+                                <div class="preset-cards">
+                                    <div class="preset-card" onclick="applyPreset('python')">
+                                        <div class="preset-icon">🐍</div>
+                                        <div class="preset-name">Python</div>
+                                    </div>
+                                    <div class="preset-card" onclick="applyPreset('node')">
+                                        <div class="preset-icon">📦</div>
+                                        <div class="preset-name">Node.js</div>
+                                    </div>
+                                    <div class="preset-card" onclick="applyPreset('java')">
+                                        <div class="preset-icon">☕</div>
+                                        <div class="preset-name">Java</div>
+                                    </div>
+                                    <div class="preset-card" onclick="applyPreset('go')">
+                                        <div class="preset-icon">🔷</div>
+                                        <div class="preset-name">Go</div>
+                                    </div>
+                                    <div class="preset-card" onclick="applyPreset('microservices')">
+                                        <div class="preset-icon">🔗</div>
+                                        <div class="preset-name">Microservices</div>
+                                    </div>
+                                    <div class="preset-card" onclick="applyPreset('ml')">
+                                        <div class="preset-icon">🤖</div>
+                                        <div class="preset-name">ML Pipeline</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" id="configTypeLabel">Configuration Type</label>
+                                <select class="form-select" id="configType">
+                                    <option value="dockerfile">Dockerfile</option>
+                                    <option value="docker_compose">Docker Compose</option>
+                                    <option value="kubernetes">Kubernetes</option>
+                                    <option value="helm">Helm Chart</option>
+                                    <option value="github_actions">GitHub Actions</option>
+                                    <option value="gitlab_ci">GitLab CI</option>
+                                    <option value="jenkins">Jenkinsfile</option>
+                                    <option value="terraform">Terraform</option>
+                                    <option value="ansible">Ansible</option>
+                                    <option value="nginx">Nginx</option>
+                                    <option value="prometheus">Prometheus</option>
+                                    <option value="grafana">Grafana</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" id="requirementsLabel">Requirements</label>
+                                <textarea class="form-textarea" id="requirements" placeholder="Describe your requirements...">Python Flask application with PostgreSQL database, Redis cache, production-ready with health checks and resource limits</textarea>
+                            </div>
+                            <button class="btn btn-primary" style="width:100%;" onclick="generateConfig()" id="generateBtn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                                </svg>
+                                <span>Generate Configuration</span>
+                            </button>
+                        </div>
+                        <div id="logsForm" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label" id="logTypeLabel">Log Type</label>
+                                <select class="form-select" id="logType">
+                                    <option value="docker">Docker Logs</option>
+                                    <option value="kubernetes">Kubernetes Logs</option>
+                                    <option value="nginx">Nginx Logs</option>
+                                    <option value="application">Application Logs</option>
+                                    <option value="system">System Logs</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" id="logsInputLabel">Paste Your Logs</label>
+                                <textarea class="form-textarea" id="logsInput" placeholder="Paste your logs here...">2024-01-15 10:23:45 ERROR [main] DatabaseConnection: Failed to connect to PostgreSQL
+java.sql.SQLException: Connection refused
+    at org.postgresql.Driver.connect(Driver.java:290)
+2024-01-15 10:23:46 WARN [worker-1] MemoryMonitor: Heap usage above 80%
+2024-01-15 10:23:47 ERROR [http-8080] RequestHandler: Timeout waiting for response</textarea>
+                            </div>
+                            <button class="btn btn-primary" style="width:100%;" onclick="analyzeLogs()" id="analyzeLogsBtn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                <span>Analyze Logs</span>
+                            </button>
+                        </div>
+                        <div id="diagnoseForm" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label" id="errorTypeLabel">Error Type</label>
+                                <select class="form-select" id="errorType">
+                                    <option value="docker">Docker Error</option>
+                                    <option value="kubernetes">Kubernetes Error</option>
+                                    <option value="terraform">Terraform Error</option>
+                                    <option value="cicd">CI/CD Error</option>
+                                    <option value="database">Database Error</option>
+                                    <option value="network">Network Error</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" id="errorInputLabel">Error Message</label>
+                                <textarea class="form-textarea" id="errorInput" placeholder="Paste your error message...">Error: ImagePullBackOff - Back-off pulling image "myapp:latest"
+Failed to pull image "myapp:latest": rpc error: code = Unknown desc = Error response from daemon: manifest for myapp:latest not found</textarea>
+                            </div>
+                            <button class="btn btn-primary" style="width:100%;" onclick="diagnoseError()" id="diagnoseBtn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                <span>Diagnose Error</span>
+                            </button>
+                        </div>
+                        <div id="monitorForm" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label" id="monitorTypeLabel">Monitor Type</label>
+                                <select class="form-select" id="monitorType">
+                                    <option value="metrics">Prometheus Metrics</option>
+                                    <option value="alerts">Alert Rules</option>
+                                    <option value="dashboards">Grafana Dashboard</option>
+                                    <option value="runbooks">Runbooks</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" id="monitorTargetLabel">Target Service</label>
+                                <textarea class="form-textarea" id="monitorTarget" placeholder="Describe your service...">Python Flask API service with PostgreSQL, Redis, handling 1000 req/s with 99.9% SLA requirement</textarea>
+                            </div>
+                            <button class="btn btn-primary" style="width:100%;" onclick="generateMonitor()" id="generateMonitorBtn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                                <span>Generate Monitoring</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title" id="outputPanelTitle">OUTPUT</span>
+                    </div>
+                    <div class="panel-body" id="outputContainer">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="9" y1="9" x2="15" y2="9"/>
+                                <line x1="9" y1="13" x2="15" y2="13"/>
+                                <line x1="9" y1="17" x2="12" y2="17"/>
+                            </svg>
+                            <h3 id="emptyTitle">No Output Yet</h3>
+                            <p id="emptyDesc">Configure your input and run the analysis</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
+    </section>
+
+    <section class="tools-section">
+        <h2 class="section-title" id="toolsTitle">Supported Tools & Platforms</h2>
+        <div class="tools-grid">
+            <div class="tool-card"><div class="tool-icon">🐳</div><div class="tool-name">Docker</div><div class="tool-desc">Containers</div></div>
+            <div class="tool-card"><div class="tool-icon">☸️</div><div class="tool-name">Kubernetes</div><div class="tool-desc">Orchestration</div></div>
+            <div class="tool-card"><div class="tool-icon">⎈</div><div class="tool-name">Helm</div><div class="tool-desc">Package Manager</div></div>
+            <div class="tool-card"><div class="tool-icon">🔷</div><div class="tool-name">Terraform</div><div class="tool-desc">IaC</div></div>
+            <div class="tool-card"><div class="tool-icon">📋</div><div class="tool-name">Ansible</div><div class="tool-desc">Automation</div></div>
+            <div class="tool-card"><div class="tool-icon">🔥</div><div class="tool-name">Prometheus</div><div class="tool-desc">Monitoring</div></div>
+            <div class="tool-card"><div class="tool-icon">📊</div><div class="tool-name">Grafana</div><div class="tool-desc">Dashboards</div></div>
+            <div class="tool-card"><div class="tool-icon">🚀</div><div class="tool-name">GitHub Actions</div><div class="tool-desc">CI/CD</div></div>
+            <div class="tool-card"><div class="tool-icon">🦊</div><div class="tool-name">GitLab CI</div><div class="tool-desc">CI/CD</div></div>
+            <div class="tool-card"><div class="tool-icon">🔧</div><div class="tool-name">Jenkins</div><div class="tool-desc">CI/CD</div></div>
+            <div class="tool-card"><div class="tool-icon">🌐</div><div class="tool-name">Nginx</div><div class="tool-desc">Web Server</div></div>
+            <div class="tool-card"><div class="tool-icon">🐘</div><div class="tool-name">PostgreSQL</div><div class="tool-desc">Database</div></div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Built with AI for DevOps Engineers</p>
+        <p style="margin-top: 0.5rem;">
+            <a href="https://github.com/yoon-k/openwebui-devops-assistant">GitHub</a> ·
+            <a href="https://github.com/yoon-k">@yoon-k</a>
+        </p>
+    </footer>
 
     <script>
-const i18n = {
-    en: { title: "AI DevOps Assistant", subtitle: "Log analysis, config generation, error diagnosis", input: "INPUT", output: "OUTPUT",
-        tabConfig: "Config", tabLogs: "Logs", tabDiagnose: "Diagnose", tabChat: "Chat",
-        configType: "Config Type", description: "Description", descPlaceholder: "Describe what you need...",
-        requirements: "Requirements", reqPlaceholder: "Enter requirements (optional)", generate: "Generate",
-        logs: "Log Content", logsPlaceholder: "Paste your logs here...", logType: "Log Type", analyze: "Analyze",
-        errorMsg: "Error Message", errorPlaceholder: "Paste the error message...", context: "Context",
-        contextPlaceholder: "Additional context...", stackTrace: "Stack Trace", diagnose: "Diagnose",
-        chatPlaceholder: "Ask about DevOps...", send: "Send", emptyTitle: "No Output Yet",
-        emptyDesc: "Configure your input and run the analysis",
-        dockerfile: "Dockerfile", docker_compose: "Docker Compose", kubernetes: "Kubernetes",
-        github_actions: "GitHub Actions", gitlab_ci: "GitLab CI", terraform: "Terraform", nginx: "Nginx", prometheus: "Prometheus",
-        welcome: "Hi! I'm your DevOps assistant. I can help with:\n\n• Docker & Kubernetes configs\n• CI/CD pipelines\n• Log analysis\n• Error diagnosis\n• Infrastructure setup" },
-    ko: { title: "AI DevOps 도우미", subtitle: "로그 분석, 설정 생성, 오류 진단", input: "입력", output: "출력",
-        tabConfig: "설정", tabLogs: "로그", tabDiagnose: "진단", tabChat: "채팅",
-        configType: "설정 유형", description: "설명", descPlaceholder: "필요한 것을 설명하세요...",
-        requirements: "요구사항", reqPlaceholder: "요구사항 입력 (선택)", generate: "생성",
-        logs: "로그 내용", logsPlaceholder: "로그를 붙여넣으세요...", logType: "로그 유형", analyze: "분석",
-        errorMsg: "오류 메시지", errorPlaceholder: "오류 메시지를 붙여넣으세요...", context: "컨텍스트",
-        contextPlaceholder: "추가 컨텍스트...", stackTrace: "스택 트레이스", diagnose: "진단",
-        chatPlaceholder: "DevOps에 대해 질문하세요...", send: "전송", emptyTitle: "출력 없음",
-        emptyDesc: "입력을 구성하고 분석을 실행하세요",
-        dockerfile: "Dockerfile", docker_compose: "Docker Compose", kubernetes: "Kubernetes",
-        github_actions: "GitHub Actions", gitlab_ci: "GitLab CI", terraform: "Terraform", nginx: "Nginx", prometheus: "Prometheus",
-        welcome: "안녕하세요! DevOps 도우미입니다:\n\n• Docker & Kubernetes 설정\n• CI/CD 파이프라인\n• 로그 분석\n• 오류 진단\n• 인프라 설정" },
-    ja: { title: "AI DevOpsアシスタント", subtitle: "ログ分析、設定生成、エラー診断", input: "入力", output: "出力",
-        tabConfig: "設定", tabLogs: "ログ", tabDiagnose: "診断", tabChat: "チャット",
-        configType: "設定タイプ", description: "説明", descPlaceholder: "必要なものを説明...",
-        requirements: "要件", reqPlaceholder: "要件を入力（オプション）", generate: "生成",
-        logs: "ログ内容", logsPlaceholder: "ログを貼り付け...", logType: "ログタイプ", analyze: "分析",
-        errorMsg: "エラーメッセージ", errorPlaceholder: "エラーメッセージを貼り付け...", context: "コンテキスト",
-        contextPlaceholder: "追加コンテキスト...", stackTrace: "スタックトレース", diagnose: "診断",
-        chatPlaceholder: "DevOpsについて質問...", send: "送信", emptyTitle: "出力なし",
-        emptyDesc: "入力を設定して分析を実行",
-        dockerfile: "Dockerfile", docker_compose: "Docker Compose", kubernetes: "Kubernetes",
-        github_actions: "GitHub Actions", gitlab_ci: "GitLab CI", terraform: "Terraform", nginx: "Nginx", prometheus: "Prometheus",
-        welcome: "こんにちは！DevOpsアシスタントです:\n\n• Docker & Kubernetes設定\n• CI/CDパイプライン\n• ログ分析\n• エラー診断\n• インフラ設定" }
-};
-
-let currentLang = 'en', currentTab = 'config', chatHistory = [];
-document.addEventListener('DOMContentLoaded', () => { setLanguage('en'); chatHistory = [{ role: 'assistant', content: i18n.en.welcome }]; });
-
-function setLanguage(lang) {
-    currentLang = lang;
-    const t = i18n[lang];
-    document.getElementById('title').textContent = t.title;
-    document.getElementById('subtitle').textContent = t.subtitle;
-    document.getElementById('inputTitle').textContent = t.input;
-    document.getElementById('outputTitle').textContent = t.output;
-    document.getElementById('tabConfig').textContent = t.tabConfig;
-    document.getElementById('tabLogs').textContent = t.tabLogs;
-    document.getElementById('tabDiagnose').textContent = t.tabDiagnose;
-    document.getElementById('tabChat').textContent = t.tabChat;
-    document.querySelectorAll('.lang-btn').forEach((btn, i) => btn.classList.toggle('active', i === ['en','ko','ja'].indexOf(lang)));
-    chatHistory = [{ role: 'assistant', content: t.welcome }];
-    updateForm();
-}
-
-function showTab(tab, btn) {
-    currentTab = tab;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    updateForm();
-}
-
-function updateForm() {
-    const t = i18n[currentLang], form = document.getElementById('formContainer');
-    const types = ['dockerfile', 'docker_compose', 'kubernetes', 'github_actions', 'gitlab_ci', 'terraform', 'nginx', 'prometheus'];
-
-    if (currentTab === 'config') {
-        form.innerHTML = `
-            <div class="form-group"><label class="form-label">${t.configType}</label>
-                <div class="chips">${types.map((type, i) => `<span class="chip ${i===0?'active':''}" onclick="selectChip(this)">${t[type]}</span>`).join('')}</div>
-            </div>
-            <div class="form-group"><label class="form-label">${t.description}</label><textarea class="form-textarea" rows="4" placeholder="${t.descPlaceholder}">Python Flask web application with PostgreSQL database</textarea></div>
-            <div class="form-group"><label class="form-label">${t.requirements}</label><input type="text" class="form-input" placeholder="${t.reqPlaceholder}" value="health check, logging, multi-stage build"></div>
-            <button class="btn btn-primary" onclick="runDemo('config')">${t.generate}</button>`;
-    } else if (currentTab === 'logs') {
-        form.innerHTML = `
-            <div class="form-group"><label class="form-label">${t.logs}</label><textarea class="form-textarea" rows="8" placeholder="${t.logsPlaceholder}">[2024-01-15 10:23:45] ERROR: Connection refused to database at 192.168.1.100:5432
-[2024-01-15 10:23:46] WARN: Retrying connection (attempt 1/3)
-[2024-01-15 10:23:47] ERROR: Connection timeout after 30s
-[2024-01-15 10:23:48] CRITICAL: Unable to establish database connection</textarea></div>
-            <div class="form-group"><label class="form-label">${t.logType}</label><input type="text" class="form-input" value="application"></div>
-            <button class="btn btn-primary" onclick="runDemo('logs')">${t.analyze}</button>`;
-    } else if (currentTab === 'diagnose') {
-        form.innerHTML = `
-            <div class="form-group"><label class="form-label">${t.errorMsg}</label><textarea class="form-textarea" rows="3" placeholder="${t.errorPlaceholder}">OOMKilled: Container exceeded memory limit</textarea></div>
-            <div class="form-group"><label class="form-label">${t.context}</label><input type="text" class="form-input" placeholder="${t.contextPlaceholder}" value="Kubernetes pod running Java application"></div>
-            <div class="form-group"><label class="form-label">${t.stackTrace}</label><textarea class="form-textarea" rows="3">java.lang.OutOfMemoryError: Java heap space at java.util.Arrays.copyOf</textarea></div>
-            <button class="btn btn-primary" onclick="runDemo('diagnose')">${t.diagnose}</button>`;
-    } else if (currentTab === 'chat') {
-        form.innerHTML = `<div class="chat-messages" id="chatMessages"></div><div class="chat-input-container"><input type="text" class="form-input" id="chatInput" placeholder="${t.chatPlaceholder}" onkeypress="if(event.key==='Enter')sendChat()"><button class="btn btn-primary" style="width:auto" onclick="sendChat()">${t.send}</button></div>`;
-        renderChat();
-    }
-}
-
-function selectChip(el) { document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); }
-
-function runDemo(type) {
-    const output = document.getElementById('outputContainer');
-    output.innerHTML = '<div class="loading"><div class="spinner"></div>Processing...</div>';
-
-    setTimeout(() => {
-        if (type === 'config') {
-            output.innerHTML = `<div class="code-block">FROM python:3.11-slim as builder
-
+        const i18n = {
+            en: { title: 'AI DevOps Assistant', subtitle: 'Log analysis, config generation, monitoring, error diagnosis', heroTitle: 'AI-Powered DevOps Assistant', heroDesc: 'Automate your DevOps workflow with intelligent log analysis, configuration generation, system monitoring, and error diagnosis. Support for Docker, Kubernetes, Terraform, and more.', tryDemoBtn: 'Try Demo', featuresTitle: 'Powerful Features', feature1Title: 'Config Generation', feature1Desc: 'Generate production-ready configurations for Docker, Kubernetes, Terraform, Ansible, CI/CD pipelines, and more with AI assistance.', feature2Title: 'Log Analysis', feature2Desc: 'Intelligent log parsing and analysis to identify errors, warnings, and anomalies in your system logs with actionable insights.', feature3Title: 'Error Diagnosis', feature3Desc: 'Paste error messages and get instant diagnosis with root cause analysis and recommended solutions.', feature4Title: 'System Monitoring', feature4Desc: 'Generate monitoring configurations for Prometheus, Grafana, alerting rules, and runbooks for your infrastructure.', feature5Title: 'Multi-Platform Support', feature5Desc: 'Supports Docker, Kubernetes, Helm, GitHub Actions, GitLab CI, Jenkins, Terraform, Ansible, Nginx, and more.', feature6Title: '7 Languages', feature6Desc: 'Full internationalization support with English, Korean, Japanese, Chinese, Spanish, French, and German.', demoTitle: 'Interactive Demo', inputPanelTitle: 'INPUT', outputPanelTitle: 'OUTPUT', tabConfig: 'Config', tabLogs: 'Logs', tabDiagnose: 'Diagnose', tabMonitor: 'Monitor', presetsTitle: 'Quick Presets', configTypeLabel: 'Configuration Type', requirementsLabel: 'Requirements', generateBtn: 'Generate Configuration', logTypeLabel: 'Log Type', logsInputLabel: 'Paste Your Logs', analyzeLogsBtn: 'Analyze Logs', errorTypeLabel: 'Error Type', errorInputLabel: 'Error Message', diagnoseBtn: 'Diagnose Error', monitorTypeLabel: 'Monitor Type', monitorTargetLabel: 'Target Service', generateMonitorBtn: 'Generate Monitoring', emptyTitle: 'No Output Yet', emptyDesc: 'Configure your input and run the analysis', toolsTitle: 'Supported Tools & Platforms', copyBtn: 'Copy', downloadBtn: 'Download' },
+            ko: { title: 'AI DevOps 어시스턴트', subtitle: '로그 분석, 설정 생성, 모니터링, 오류 진단', heroTitle: 'AI 기반 DevOps 어시스턴트', heroDesc: '지능형 로그 분석, 설정 생성, 시스템 모니터링, 오류 진단으로 DevOps 워크플로우를 자동화하세요. Docker, Kubernetes, Terraform 등을 지원합니다.', tryDemoBtn: '데모 체험', featuresTitle: '강력한 기능', feature1Title: '설정 생성', feature1Desc: 'AI 지원으로 Docker, Kubernetes, Terraform, Ansible, CI/CD 파이프라인 등의 프로덕션급 설정을 생성합니다.', feature2Title: '로그 분석', feature2Desc: '시스템 로그에서 오류, 경고, 이상 현상을 식별하고 실행 가능한 인사이트를 제공합니다.', feature3Title: '오류 진단', feature3Desc: '오류 메시지를 붙여넣고 근본 원인 분석 및 권장 솔루션과 함께 즉시 진단을 받으세요.', feature4Title: '시스템 모니터링', feature4Desc: '인프라를 위한 Prometheus, Grafana, 알림 규칙, 런북 모니터링 설정을 생성합니다.', feature5Title: '멀티 플랫폼 지원', feature5Desc: 'Docker, Kubernetes, Helm, GitHub Actions, GitLab CI, Jenkins, Terraform, Ansible, Nginx 등을 지원합니다.', feature6Title: '7개 언어 지원', feature6Desc: '영어, 한국어, 일본어, 중국어, 스페인어, 프랑스어, 독일어를 완벽 지원합니다.', demoTitle: '인터랙티브 데모', inputPanelTitle: '입력', outputPanelTitle: '출력', tabConfig: '설정', tabLogs: '로그', tabDiagnose: '진단', tabMonitor: '모니터링', presetsTitle: '빠른 프리셋', configTypeLabel: '설정 유형', requirementsLabel: '요구사항', generateBtn: '설정 생성', logTypeLabel: '로그 유형', logsInputLabel: '로그 붙여넣기', analyzeLogsBtn: '로그 분석', errorTypeLabel: '오류 유형', errorInputLabel: '오류 메시지', diagnoseBtn: '오류 진단', monitorTypeLabel: '모니터링 유형', monitorTargetLabel: '대상 서비스', generateMonitorBtn: '모니터링 생성', emptyTitle: '아직 출력이 없습니다', emptyDesc: '입력을 구성하고 분석을 실행하세요', toolsTitle: '지원 도구 및 플랫폼', copyBtn: '복사', downloadBtn: '다운로드' },
+            ja: { title: 'AI DevOps アシスタント', subtitle: 'ログ分析、設定生成、監視、エラー診断', heroTitle: 'AI搭載 DevOps アシスタント', heroDesc: 'インテリジェントなログ分析、設定生成、システム監視、エラー診断でDevOpsワークフローを自動化。', tryDemoBtn: 'デモを試す', featuresTitle: '強力な機能', feature1Title: '設定生成', feature1Desc: 'AIアシスタンスで Docker、Kubernetes、Terraform、Ansible等の本番対応設定を生成します。', feature2Title: 'ログ分析', feature2Desc: 'システムログのエラー、警告、異常を特定するインテリジェントなログ解析と分析。', feature3Title: 'エラー診断', feature3Desc: 'エラーメッセージを貼り付けて、根本原因分析と推奨ソリューションで即座に診断。', feature4Title: 'システム監視', feature4Desc: 'Prometheus、Grafana、アラートルール、ランブックの監視設定を生成。', feature5Title: 'マルチプラットフォーム', feature5Desc: 'Docker、Kubernetes、Helm、GitHub Actions、GitLab CI、Jenkins等をサポート。', feature6Title: '7言語対応', feature6Desc: '英語、韓国語、日本語、中国語、スペイン語、フランス語、ドイツ語を完全サポート。', demoTitle: 'インタラクティブデモ', inputPanelTitle: '入力', outputPanelTitle: '出力', tabConfig: '設定', tabLogs: 'ログ', tabDiagnose: '診断', tabMonitor: '監視', presetsTitle: 'クイックプリセット', configTypeLabel: '設定タイプ', requirementsLabel: '要件', generateBtn: '設定を生成', logTypeLabel: 'ログタイプ', logsInputLabel: 'ログを貼り付け', analyzeLogsBtn: 'ログを分析', errorTypeLabel: 'エラータイプ', errorInputLabel: 'エラーメッセージ', diagnoseBtn: 'エラーを診断', monitorTypeLabel: '監視タイプ', monitorTargetLabel: '対象サービス', generateMonitorBtn: '監視を生成', emptyTitle: 'まだ出力がありません', emptyDesc: '入力を設定して分析を実行', toolsTitle: 'サポートツール', copyBtn: 'コピー', downloadBtn: 'ダウンロード' },
+            zh: { title: 'AI DevOps 助手', subtitle: '日志分析、配置生成、监控、错误诊断', heroTitle: 'AI驱动的 DevOps 助手', heroDesc: '通过智能日志分析、配置生成、系统监控和错误诊断自动化您的DevOps工作流程。', tryDemoBtn: '体验演示', featuresTitle: '强大功能', feature1Title: '配置生成', feature1Desc: '借助AI辅助，为Docker、Kubernetes、Terraform、Ansible等生成生产就绪的配置。', feature2Title: '日志分析', feature2Desc: '智能日志解析和分析，识别系统日志中的错误、警告和异常。', feature3Title: '错误诊断', feature3Desc: '粘贴错误消息，获取即时诊断，包括根本原因分析和推荐解决方案。', feature4Title: '系统监控', feature4Desc: '为您的基础设施生成Prometheus、Grafana、告警规则和运维手册的监控配置。', feature5Title: '多平台支持', feature5Desc: '支持Docker、Kubernetes、Helm、GitHub Actions、GitLab CI、Jenkins等。', feature6Title: '7种语言', feature6Desc: '完全支持英语、韩语、日语、中文、西班牙语、法语和德语。', demoTitle: '交互式演示', inputPanelTitle: '输入', outputPanelTitle: '输出', tabConfig: '配置', tabLogs: '日志', tabDiagnose: '诊断', tabMonitor: '监控', presetsTitle: '快速预设', configTypeLabel: '配置类型', requirementsLabel: '需求', generateBtn: '生成配置', logTypeLabel: '日志类型', logsInputLabel: '粘贴日志', analyzeLogsBtn: '分析日志', errorTypeLabel: '错误类型', errorInputLabel: '错误消息', diagnoseBtn: '诊断错误', monitorTypeLabel: '监控类型', monitorTargetLabel: '目标服务', generateMonitorBtn: '生成监控', emptyTitle: '暂无输出', emptyDesc: '配置输入并运行分析', toolsTitle: '支持的工具和平台', copyBtn: '复制', downloadBtn: '下载' },
+            es: { title: 'Asistente AI DevOps', subtitle: 'Análisis de logs, generación de config, monitoreo', heroTitle: 'Asistente DevOps con IA', heroDesc: 'Automatiza tu flujo de trabajo DevOps con análisis inteligente de logs y generación de configuración.', tryDemoBtn: 'Probar Demo', featuresTitle: 'Características', feature1Title: 'Generación de Config', feature1Desc: 'Genera configuraciones para Docker, Kubernetes, Terraform con asistencia de IA.', feature2Title: 'Análisis de Logs', feature2Desc: 'Análisis inteligente de logs para identificar errores y advertencias.', feature3Title: 'Diagnóstico', feature3Desc: 'Diagnóstico instantáneo con análisis de causa raíz.', feature4Title: 'Monitoreo', feature4Desc: 'Genera configuraciones de monitoreo para Prometheus y Grafana.', feature5Title: 'Multi-Plataforma', feature5Desc: 'Soporta Docker, Kubernetes, Helm, GitHub Actions y más.', feature6Title: '7 Idiomas', feature6Desc: 'Soporte completo de internacionalización.', demoTitle: 'Demo Interactivo', inputPanelTitle: 'ENTRADA', outputPanelTitle: 'SALIDA', tabConfig: 'Config', tabLogs: 'Logs', tabDiagnose: 'Diagnóstico', tabMonitor: 'Monitor', presetsTitle: 'Presets', configTypeLabel: 'Tipo', requirementsLabel: 'Requisitos', generateBtn: 'Generar', logTypeLabel: 'Tipo de Log', logsInputLabel: 'Pegar Logs', analyzeLogsBtn: 'Analizar', errorTypeLabel: 'Tipo de Error', errorInputLabel: 'Mensaje', diagnoseBtn: 'Diagnosticar', monitorTypeLabel: 'Tipo', monitorTargetLabel: 'Servicio', generateMonitorBtn: 'Generar', emptyTitle: 'Sin Salida', emptyDesc: 'Configura y ejecuta', toolsTitle: 'Herramientas', copyBtn: 'Copiar', downloadBtn: 'Descargar' },
+            fr: { title: 'Assistant AI DevOps', subtitle: 'Analyse de logs, génération de config, monitoring', heroTitle: 'Assistant DevOps IA', heroDesc: 'Automatisez votre workflow DevOps avec l\'analyse intelligente de logs et la génération de configuration.', tryDemoBtn: 'Essayer', featuresTitle: 'Fonctionnalités', feature1Title: 'Génération Config', feature1Desc: 'Générez des configurations pour Docker, Kubernetes, Terraform avec IA.', feature2Title: 'Analyse Logs', feature2Desc: 'Analyse intelligente des logs pour identifier erreurs et avertissements.', feature3Title: 'Diagnostic', feature3Desc: 'Diagnostic instantané avec analyse des causes.', feature4Title: 'Surveillance', feature4Desc: 'Générez des configurations de monitoring Prometheus et Grafana.', feature5Title: 'Multi-Plateforme', feature5Desc: 'Supporte Docker, Kubernetes, Helm, GitHub Actions et plus.', feature6Title: '7 Langues', feature6Desc: 'Support complet d\'internationalisation.', demoTitle: 'Démo Interactive', inputPanelTitle: 'ENTRÉE', outputPanelTitle: 'SORTIE', tabConfig: 'Config', tabLogs: 'Logs', tabDiagnose: 'Diagnostic', tabMonitor: 'Monitor', presetsTitle: 'Presets', configTypeLabel: 'Type', requirementsLabel: 'Exigences', generateBtn: 'Générer', logTypeLabel: 'Type Log', logsInputLabel: 'Coller Logs', analyzeLogsBtn: 'Analyser', errorTypeLabel: 'Type Erreur', errorInputLabel: 'Message', diagnoseBtn: 'Diagnostiquer', monitorTypeLabel: 'Type', monitorTargetLabel: 'Service', generateMonitorBtn: 'Générer', emptyTitle: 'Pas de Sortie', emptyDesc: 'Configurez et lancez', toolsTitle: 'Outils', copyBtn: 'Copier', downloadBtn: 'Télécharger' },
+            de: { title: 'AI DevOps Assistent', subtitle: 'Log-Analyse, Config-Generierung, Monitoring', heroTitle: 'KI DevOps Assistent', heroDesc: 'Automatisieren Sie Ihren DevOps-Workflow mit intelligenter Log-Analyse und Konfigurationsgenerierung.', tryDemoBtn: 'Demo Testen', featuresTitle: 'Funktionen', feature1Title: 'Config-Generierung', feature1Desc: 'Generieren Sie Konfigurationen für Docker, Kubernetes, Terraform mit KI.', feature2Title: 'Log-Analyse', feature2Desc: 'Intelligente Log-Analyse zur Identifizierung von Fehlern und Warnungen.', feature3Title: 'Fehlerdiagnose', feature3Desc: 'Sofortige Diagnose mit Ursachenanalyse.', feature4Title: 'Monitoring', feature4Desc: 'Generieren Sie Monitoring-Konfigurationen für Prometheus und Grafana.', feature5Title: 'Multi-Plattform', feature5Desc: 'Unterstützt Docker, Kubernetes, Helm, GitHub Actions und mehr.', feature6Title: '7 Sprachen', feature6Desc: 'Vollständige Internationalisierung.', demoTitle: 'Interaktive Demo', inputPanelTitle: 'EINGABE', outputPanelTitle: 'AUSGABE', tabConfig: 'Config', tabLogs: 'Logs', tabDiagnose: 'Diagnose', tabMonitor: 'Monitor', presetsTitle: 'Presets', configTypeLabel: 'Typ', requirementsLabel: 'Anforderungen', generateBtn: 'Generieren', logTypeLabel: 'Log-Typ', logsInputLabel: 'Logs Einfügen', analyzeLogsBtn: 'Analysieren', errorTypeLabel: 'Fehlertyp', errorInputLabel: 'Meldung', diagnoseBtn: 'Diagnostizieren', monitorTypeLabel: 'Typ', monitorTargetLabel: 'Service', generateMonitorBtn: 'Generieren', emptyTitle: 'Keine Ausgabe', emptyDesc: 'Konfigurieren und ausführen', toolsTitle: 'Tools', copyBtn: 'Kopieren', downloadBtn: 'Download' }
+        };
+        let currentLang = 'en';
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+            updateTexts();
+        }
+        function updateTexts() {
+            const t = i18n[currentLang];
+            Object.keys(t).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' ? el.placeholder = t[key] : el.textContent = t[key];
+            });
+        }
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            document.getElementById('configForm').style.display = tab === 'config' ? 'block' : 'none';
+            document.getElementById('logsForm').style.display = tab === 'logs' ? 'block' : 'none';
+            document.getElementById('diagnoseForm').style.display = tab === 'diagnose' ? 'block' : 'none';
+            document.getElementById('monitorForm').style.display = tab === 'monitor' ? 'block' : 'none';
+        }
+        function applyPreset(preset) {
+            const presets = {
+                python: { configType: 'dockerfile', requirements: 'Python Flask application with PostgreSQL database, Redis cache, Gunicorn WSGI server, production-ready with health checks' },
+                node: { configType: 'dockerfile', requirements: 'Node.js Express API with MongoDB, PM2 process manager, production build with multi-stage Dockerfile' },
+                java: { configType: 'dockerfile', requirements: 'Java Spring Boot application with MySQL, Maven build, JVM optimizations for containers' },
+                go: { configType: 'dockerfile', requirements: 'Go Gin API service, static binary build, minimal Alpine image, health endpoints' },
+                microservices: { configType: 'kubernetes', requirements: 'Microservices architecture with API gateway, service mesh (Istio), auto-scaling' },
+                ml: { configType: 'docker_compose', requirements: 'ML pipeline with Jupyter, TensorFlow, MLflow tracking, GPU support' }
+            };
+            document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+            event.target.closest('.preset-card').classList.add('active');
+            const p = presets[preset];
+            if (p) { document.getElementById('configType').value = p.configType; document.getElementById('requirements').value = p.requirements; }
+        }
+        function generateConfig() {
+            const configType = document.getElementById('configType').value;
+            let output = configType === 'dockerfile' ? `# Production Dockerfile for Python Flask Application
+FROM python:3.11-slim as builder
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential libpq-dev && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
 FROM python:3.11-slim
 WORKDIR /app
-
-# Create non-root user
-RUN useradd -m -u 1000 appuser
-
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY . .
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \\
-    CMD curl -f http://localhost:5000/health || exit 1
-
+RUN apt-get update && apt-get install -y --no-install-recommends libpq5 curl && rm -rf /var/lib/apt/lists/* && useradd -m -r appuser
+COPY --from=builder /app/wheels /wheels
+RUN pip install --no-cache /wheels/*
+COPY --chown=appuser:appuser . .
 USER appuser
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -f http://localhost:5000/health || exit 1
 EXPOSE 5000
-
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]</div>
-<p style="margin-top:1rem;color:var(--text-secondary)">✅ Multi-stage build for smaller image size<br>✅ Non-root user for security<br>✅ Health check endpoint configured<br>✅ Production-ready with Gunicorn</p>`;
-        } else if (type === 'logs') {
-            output.innerHTML = `<h3 style="margin-bottom:1rem">Log Analysis Results</h3>
-<div class="issue-item error"><span class="issue-level error">CRITICAL</span><p style="margin:0.5rem 0">Database connection failure detected</p><p style="color:var(--text-secondary);font-size:0.8125rem">Check if PostgreSQL is running and accessible at 192.168.1.100:5432</p></div>
-<div class="issue-item warning"><span class="issue-level warning">WARNING</span><p style="margin:0.5rem 0">Connection timeout (30s) may be too short</p><p style="color:var(--text-secondary);font-size:0.8125rem">Consider increasing timeout or checking network latency</p></div>
-<div class="issue-item info"><span class="issue-level info">INFO</span><p style="margin:0.5rem 0">Retry mechanism is working (3 attempts)</p><p style="color:var(--text-secondary);font-size:0.8125rem">Consider implementing exponential backoff</p></div>
-<p style="margin-top:1rem"><strong>Root Cause:</strong> Database server at 192.168.1.100 is either down or firewall is blocking port 5432</p>`;
-        } else if (type === 'diagnose') {
-            output.innerHTML = `<h3 style="margin-bottom:1rem">Error Diagnosis</h3>
-<p><strong>Issue:</strong> Java application running out of memory (OOMKilled by Kubernetes)</p>
-<p style="margin-top:1rem"><strong>Root Cause:</strong> JVM heap size exceeds container memory limits</p>
-<p style="margin-top:1rem"><strong>Solution:</strong> Configure JVM memory settings to respect container limits</p>
-<h4 style="margin-top:1rem">Recommended Steps:</h4>
-<ol style="padding-left:1.5rem;color:var(--text-secondary);line-height:1.8">
-<li>Add JVM flags: <code>-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0</code></li>
-<li>Increase pod memory limit: <code>resources.limits.memory: 2Gi</code></li>
-<li>Set JVM heap explicitly: <code>-Xmx1536m -Xms512m</code></li>
-<li>Enable GC logging to monitor memory usage</li>
-<li>Consider using G1GC: <code>-XX:+UseG1GC</code></li>
-</ol>`;
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "app:app"]` : configType === 'kubernetes' ? `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: api-gateway
+        image: myregistry/api-gateway:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests: { cpu: "100m", memory: "128Mi" }
+          limits: { cpu: "500m", memory: "512Mi" }
+        readinessProbe:
+          httpGet: { path: /health/ready, port: 8080 }
+        livenessProbe:
+          httpGet: { path: /health/live, port: 8080 }
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-gateway-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-gateway
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target: { type: Utilization, averageUtilization: 70 }` : `# ${configType} Configuration\n# Generated based on your requirements`;
+            showOutput(output, configType);
         }
-    }, 1500);
-}
-
-function renderChat() {
-    const container = document.getElementById('chatMessages');
-    if (!container) return;
-    container.innerHTML = chatHistory.map(m => `<div class="message ${m.role}">${m.content.replace(/\n/g, '<br>')}</div>`).join('');
-    container.scrollTop = container.scrollHeight;
-}
-
-function sendChat() {
-    const input = document.getElementById('chatInput'), msg = input.value.trim();
-    if (!msg) return;
-    input.value = '';
-    chatHistory.push({ role: 'user', content: msg });
-    renderChat();
-
-    setTimeout(() => {
-        let response = "I'd be happy to help with that DevOps question! In a production environment, I would analyze your query and provide detailed guidance on Docker, Kubernetes, CI/CD, monitoring, and infrastructure best practices.";
-        if (msg.toLowerCase().includes('docker')) response = "For Docker best practices:\n\n• Use multi-stage builds\n• Run as non-root user\n• Minimize layers\n• Use .dockerignore\n• Pin base image versions\n• Add health checks";
-        else if (msg.toLowerCase().includes('kubernetes') || msg.toLowerCase().includes('k8s')) response = "Kubernetes recommendations:\n\n• Set resource limits/requests\n• Use liveness/readiness probes\n• Implement PodDisruptionBudgets\n• Use namespaces for isolation\n• Configure HPA for scaling";
-        chatHistory.push({ role: 'assistant', content: response });
-        renderChat();
-    }, 1000);
-}
+        function analyzeLogs() {
+            showOutput(`## Log Analysis Report\n\n### Summary\n- Total Lines: 4\n- Errors: 2\n- Warnings: 1\n\n### Issues\n\n#### 1. Database Connection Error (CRITICAL)\nRoot Cause: PostgreSQL server not accepting connections\nSolution: Verify PostgreSQL is running, check credentials\n\n#### 2. Memory Warning\nRoot Cause: JVM heap usage high\nSolution: Increase heap size with -Xmx2g\n\n#### 3. Request Timeout\nRoot Cause: Downstream service timeout\nSolution: Implement circuit breaker pattern`, 'analysis');
+        }
+        function diagnoseError() {
+            showOutput(`## Error Diagnosis\n\n### Error: ImagePullBackOff\n\n### Root Cause\nKubernetes cannot pull the container image.\n\n### Solutions\n\n1. Verify image exists:\n\`\`\`bash\ndocker pull myapp:latest\n\`\`\`\n\n2. Check pull secret:\n\`\`\`bash\nkubectl get secrets\n\`\`\`\n\n3. Use specific version tags instead of latest`, 'diagnosis');
+        }
+        function generateMonitor() {
+            const monitorType = document.getElementById('monitorType').value;
+            let output = monitorType === 'alerts' ? `groups:\n- name: flask-api-alerts\n  rules:\n  - alert: HighErrorRate\n    expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.01\n    for: 5m\n    labels:\n      severity: critical\n    annotations:\n      summary: "High error rate detected"\n\n  - alert: HighLatencyP99\n    expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 0.5\n    for: 5m\n    labels:\n      severity: warning` : `global:\n  scrape_interval: 15s\n\nscrape_configs:\n  - job_name: 'flask-api'\n    static_configs:\n    - targets: ['flask-api:5000']\n\n  - job_name: 'postgresql'\n    static_configs:\n    - targets: ['postgres-exporter:9187']`;
+            showOutput(output, monitorType);
+        }
+        function showOutput(content, type) {
+            const t = i18n[currentLang];
+            const files = { dockerfile: 'Dockerfile', kubernetes: 'deployment.yaml', alerts: 'alerts.yml', metrics: 'prometheus.yml', analysis: 'report.md', diagnosis: 'diagnosis.md' };
+            document.getElementById('outputContainer').innerHTML = `<div class="code-block"><div class="code-header"><span class="code-lang">${files[type] || 'output.txt'}</span><div class="code-actions"><button class="btn btn-secondary btn-sm" onclick="copyOutput()">${t.copyBtn}</button><button class="btn btn-secondary btn-sm" onclick="downloadOutput('${files[type] || 'output.txt'}')">${t.downloadBtn}</button></div></div><pre class="code-content" id="outputContent">${content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></div>`;
+        }
+        function copyOutput() { navigator.clipboard.writeText(document.getElementById('outputContent').textContent); }
+        function downloadOutput(fn) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.getElementById('outputContent').textContent])); a.download = fn; a.click(); }
+        document.addEventListener('DOMContentLoaded', updateTexts);
     </script>
 </body>
 </html>
